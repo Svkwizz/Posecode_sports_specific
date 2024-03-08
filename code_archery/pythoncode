@@ -1,0 +1,48 @@
+import cv2
+import mediapipe as mp
+import time
+import math
+
+mpDraw = mp.solutions.drawing_utils
+mpPose = mp.solutions.pose
+pose = mpPose.Pose()
+cap = cv2.VideoCapture('C:/Users/svkwi/Downloads/Archery.mp4')
+
+while True:
+    success, img = cap.read()
+    if not success:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        continue
+
+    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = pose.process(imgRGB)
+
+    if results.pose_landmarks:
+        mpDraw.draw_landmarks(img, results.pose_landmarks, mpPose.POSE_CONNECTIONS)
+
+        right_shoulder = results.pose_landmarks.landmark[mpPose.PoseLandmark.RIGHT_SHOULDER]
+        right_elbow = results.pose_landmarks.landmark[mpPose.PoseLandmark.RIGHT_ELBOW]
+        right_wrist = results.pose_landmarks.landmark[mpPose.PoseLandmark.RIGHT_WRIST]
+
+        left_shoulder = results.pose_landmarks.landmark[mpPose.PoseLandmark.LEFT_SHOULDER]
+        left_elbow = results.pose_landmarks.landmark[mpPose.PoseLandmark.LEFT_ELBOW]
+        left_wrist = results.pose_landmarks.landmark[mpPose.PoseLandmark.LEFT_WRIST]
+
+        if right_shoulder and right_elbow and right_wrist:
+            right_angle = math.degrees(math.atan2(right_wrist.y - right_elbow.y, right_wrist.x - right_elbow.x) -
+                                       math.atan2(right_shoulder.y - right_elbow.y, right_shoulder.x - right_elbow.x))
+            right_angle = abs(right_angle)
+            print("Right Elbow Angle:", right_angle)
+
+        if left_shoulder and left_elbow and left_wrist:
+            left_angle = math.degrees(math.atan2(left_wrist.y - left_elbow.y, left_wrist.x - left_elbow.x) -
+                                      math.atan2(left_shoulder.y - left_elbow.y, left_shoulder.x - left_elbow.x))
+            left_angle = abs(left_angle)
+            print("Left Elbow Angle:", left_angle)
+
+    cv2.imshow("Image", img)
+    if cv2.waitKey(50) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
