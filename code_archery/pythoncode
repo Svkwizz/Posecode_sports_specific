@@ -6,7 +6,7 @@ import math
 mpDraw = mp.solutions.drawing_utils
 mpPose = mp.solutions.pose
 pose = mpPose.Pose()
-cap = cv2.VideoCapture('C:/Users/svkwi/Downloads/Archery.mp4')
+cap = cv2.VideoCapture('your video path')
 
 while True:
     success, img = cap.read()
